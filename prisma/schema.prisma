@@ -145,14 +145,14 @@ model TutorCategory {
 }
 
 model Availability {
-  id        String  @id @default(uuid())
-  dayOfWeek Int // (0–6)
-  startTime String
-  endTime   String
-  isActive  Boolean @default(true)
-
+  id             String   @id @default(uuid())
   tutorProfileId String
-  tutorProfile   TutorProfile @relation(fields: [tutorProfileId], references: [id])
+  startTime      DateTime
+  endTime        DateTime
+  isBooked       Boolean  @default(false)
+
+  tutorProfile TutorProfile @relation(fields: [tutorProfileId], references: [id])
+  booking      Booking?
 
   @@map("availability")
 }
@@ -162,12 +162,13 @@ model Booking {
   studentId      String
   // tutorId        String
   tutorProfileId String
-  scheduledAt    DateTime
-  status         BookingStatus
+  slotId         String        @unique
+  status         BookingStatus @default(CONFIRMED)
   createdAt      DateTime      @default(now())
 
   student      User         @relation(fields: [studentId], references: [id])
   tutorProfile TutorProfile @relation(fields: [tutorProfileId], references: [id])
+  slot         Availability @relation(fields: [slotId], references: [id])
   review       Review?
 
   @@map("bookings")

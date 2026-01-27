@@ -67,9 +67,46 @@ const updateProfile = async (
   });
 };
 
+const createAvailability = async (
+  userId: string,
+  { startTime, endTime }: { startTime: string | Date; endTime: string | Date },
+) => {
+  const tutorProfile = await prisma.tutorProfile.findUniqueOrThrow({
+    where: { userId },
+    select: { id: true },
+  });
+
+  if (startTime >= endTime) {
+    throw new Error("startTime must be before endTime");
+  }
+
+  return prisma.$transaction(async (tx) => {
+    const conflict = await tx.availability.findFirst({
+      where: {
+        tutorProfileId: tutorProfile.id,
+        startTime: { lt: endTime },
+        endTime: { gt: startTime },
+      },
+    });
+
+    if (conflict) {
+      throw new Error("This time slot overlaps with an existing availability");
+    }
+
+    return tx.availability.create({
+      data: {
+        tutorProfileId: tutorProfile.id,
+        startTime,
+        endTime,
+      },
+    });
+  });
+};
+
 export const TutorService = {
   getAllTutors,
   getTutorById,
   createProfile,
   updateProfile,
+  createAvailability,
 };

@@ -81,9 +81,30 @@ const updateProfile = async (req: Request, res: Response) => {
   }
 };
 
+const createAvailability = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id as string;
+    const result = await TutorService.createAvailability(userId, req.body);
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      error:
+        error instanceof Error && error.message
+          ? error.message
+          : "An unexpected error occurred during createAvailability",
+    });
+  }
+};
+
 export const TutorController = {
   getAllTutors,
   getTutorById,
   createProfile,
   updateProfile,
+  createAvailability,
 };
