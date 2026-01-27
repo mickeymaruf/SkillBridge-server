@@ -2,9 +2,11 @@ import { toNodeHandler } from "better-auth/node";
 import express from "express";
 import { auth } from "./lib/auth";
 import { TutorRouter } from "./modules/tutor/tutor.route";
+import { UserRouter } from "./modules/user/user.route";
 
 const app = express();
 
+app.use("/api/auth", UserRouter);
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
 // Mount express json middleware after Better Auth handler
