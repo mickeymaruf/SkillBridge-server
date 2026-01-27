@@ -28,6 +28,7 @@ const getTutorById = async (id: string) => {
           category: true,
         },
       },
+      availability: true,
     },
   });
 };
