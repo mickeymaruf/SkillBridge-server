@@ -1,11 +1,35 @@
 import { prisma } from "../../lib/prisma";
 
 const getAllTutors = async () => {
-  return await prisma.tutorProfile.findMany();
+  return await prisma.tutorProfile.findMany({
+    include: {
+      user: true,
+      categories: {
+        select: {
+          category: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      },
+    },
+  });
 };
 
 const getTutorById = async (id: string) => {
-  return await prisma.tutorProfile.findUnique({ where: { id } });
+  return await prisma.tutorProfile.findUnique({
+    where: { id },
+    include: {
+      user: true,
+      categories: {
+        include: {
+          category: true,
+        },
+      },
+    },
+  });
 };
 
 const createProfile = async (
@@ -28,13 +52,18 @@ const updateProfile = async (
   data: {
     bio?: string;
     hourlyRate: number;
+    categories: string[];
   },
 ) => {
   return await prisma.tutorProfile.update({
     where: {
       userId,
     },
-    data,
+    data: {
+      categories: data.categories && {
+        create: data.categories.map((categoryId) => ({ categoryId })),
+      },
+    },
   });
 };
 
