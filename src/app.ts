@@ -20,7 +20,6 @@ app.use(express.json());
 // routes
 app.use("/api/tutors", TutorRouter);
 app.use("/api/categories", CategoryRouter);
-app.use("/api/categories", CategoryRouter);
 app.use("/api/bookings", BookingRouter);
 app.use("/api/reviews", ReviewRouter);
 app.use("/api/admin", AdminRouter);
