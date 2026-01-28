@@ -175,17 +175,17 @@ model Booking {
 }
 
 model Review {
-  id        String   @id @default(uuid())
-  bookingId String   @unique
-  studentId String
-  student   User     @relation(fields: [studentId], references: [id])
-  rating    Int // (1-5)
-  review    String
-  createdAt DateTime @default(now())
-
-  booking        Booking      @relation(fields: [bookingId], references: [id])
+  id             String   @id @default(uuid())
+  bookingId      String   @unique
+  studentId      String
   tutorProfileId String
-  tutorProfile   TutorProfile @relation(fields: [tutorProfileId], references: [id])
+  rating         Int // (1-5)
+  review         String
+  createdAt      DateTime @default(now())
+
+  booking      Booking      @relation(fields: [bookingId], references: [id])
+  student      User         @relation(fields: [studentId], references: [id])
+  tutorProfile TutorProfile @relation(fields: [tutorProfileId], references: [id])
 
   @@map("reviews")
 }

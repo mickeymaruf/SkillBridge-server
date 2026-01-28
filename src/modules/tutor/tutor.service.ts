@@ -29,6 +29,19 @@ const getTutorById = async (id: string) => {
         },
       },
       availability: true,
+      reviews: {
+        include: {
+          student: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              image: true,
+              status: true,
+            },
+          },
+        },
+      },
     },
   });
 };

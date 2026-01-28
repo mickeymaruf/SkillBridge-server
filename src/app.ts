@@ -5,6 +5,7 @@ import { TutorRouter } from "./modules/tutor/tutor.route";
 import { UserRouter } from "./modules/user/user.route";
 import { CategoryRouter } from "./modules/category/category.route";
 import { BookingRouter } from "./modules/booking/booking.route";
+import { ReviewRouter } from "./modules/review/review.route";
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use("/api/tutors", TutorRouter);
 app.use("/api/categories", CategoryRouter);
 app.use("/api/categories", CategoryRouter);
 app.use("/api/bookings", BookingRouter);
+app.use("/api/reviews", ReviewRouter);
 
 app.get("/", (req, res) => {
   res.json({
