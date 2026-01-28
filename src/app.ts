@@ -6,6 +6,7 @@ import { UserRouter } from "./modules/user/user.route";
 import { CategoryRouter } from "./modules/category/category.route";
 import { BookingRouter } from "./modules/booking/booking.route";
 import { ReviewRouter } from "./modules/review/review.route";
+import { AdminRouter } from "./modules/admin/admin.route";
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use("/api/categories", CategoryRouter);
 app.use("/api/categories", CategoryRouter);
 app.use("/api/bookings", BookingRouter);
 app.use("/api/reviews", ReviewRouter);
+app.use("/api/admin", AdminRouter);
 
 app.get("/", (req, res) => {
   res.json({
