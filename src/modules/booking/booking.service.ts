@@ -20,7 +20,7 @@ const createBooking = async (data: { studentId: string; slotId: string }) => {
   });
 };
 
-const getUserBookings = async (userId: string, role: string) => {
+const getMyBookings = async (userId: string, role: string) => {
   return await prisma.booking.findMany({
     where:
       role === UserRole.STUDENT
@@ -72,7 +72,7 @@ const cancelBooking = async (id: string) => {
 
 export const BookingService = {
   createBooking,
-  getUserBookings,
+  getMyBookings,
   getBookingById,
   markBookingCompleted,
   cancelBooking,

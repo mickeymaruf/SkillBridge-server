@@ -6,5 +6,6 @@ import { UserRole } from "../../../generated/prisma/enums";
 const router = express.Router();
 
 router.post("/", auth(UserRole.STUDENT), ReviewController.createReview);
+router.get("/:tutorProfileId", ReviewController.getTutorReviews);
 
 export const ReviewRouter = router;

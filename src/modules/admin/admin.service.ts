@@ -1,6 +1,3 @@
-import { fromNodeHeaders } from "better-auth/node";
-import { auth } from "../../lib/auth";
-import { Request } from "express";
 import { prisma } from "../../lib/prisma";
 import { UserStatus } from "../../../generated/prisma/enums";
 

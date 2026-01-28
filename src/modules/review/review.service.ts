@@ -29,6 +29,24 @@ const createReview = async (
   });
 };
 
+const getReviewsByTutor = async (tutorProfileId: string) => {
+  return await prisma.review.findMany({
+    where: { tutorProfileId },
+    include: {
+      student: {
+        select: {
+          id: true,
+          name: true,
+          image: true,
+          createdAt: true,
+        },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+};
+
 export const ReviewService = {
   createReview,
+  getReviewsByTutor,
 };

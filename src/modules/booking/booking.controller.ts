@@ -26,7 +26,7 @@ const createBooking = async (req: Request, res: Response) => {
 
 const getMyBookings = async (req: Request, res: Response) => {
   try {
-    const result = await BookingService.getUserBookings(
+    const result = await BookingService.getMyBookings(
       req.user?.id as string,
       req.user?.role as UserRole,
     );

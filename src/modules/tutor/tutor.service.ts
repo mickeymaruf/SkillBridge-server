@@ -15,6 +15,9 @@ const getAllTutors = async () => {
         },
       },
     },
+    orderBy: {
+      createdAt: "desc",
+    },
   });
 };
 
