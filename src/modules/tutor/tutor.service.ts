@@ -1,7 +1,65 @@
+import { TutorProfileWhereInput } from "../../../generated/prisma/models";
 import { prisma } from "../../lib/prisma";
 
-const getAllTutors = async () => {
+interface TutorFilters {
+  name?: string;
+  category?: string;
+  rating?: number;
+  price?: number;
+}
+
+const getAllTutors = async ({
+  name,
+  category,
+  rating,
+  price,
+}: TutorFilters) => {
+  const filters: TutorProfileWhereInput[] = [];
+
+  if (category) {
+    filters.push({
+      categories: {
+        some: {
+          category: {
+            slug: category,
+          },
+        },
+      },
+    });
+  }
+
+  if (price) {
+    filters.push({
+      hourlyRate: {
+        gte: Number(price),
+      },
+    });
+  }
+
+  if (rating) {
+    filters.push({
+      rating: {
+        gte: Number(rating),
+      },
+    });
+  }
+
+  if (name) {
+    filters.push({
+      OR: [
+        {
+          user: {
+            name: { contains: name, mode: "insensitive" },
+          },
+        },
+      ],
+    });
+  }
+
   return await prisma.tutorProfile.findMany({
+    where: {
+      AND: filters,
+    },
     include: {
       user: true,
       categories: {

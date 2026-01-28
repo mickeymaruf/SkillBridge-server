@@ -3,7 +3,14 @@ import { TutorService } from "./tutor.service";
 
 const getAllTutors = async (req: Request, res: Response) => {
   try {
-    const result = await TutorService.getAllTutors();
+    const { name, category, rating, price } = req.query;
+
+    const result = await TutorService.getAllTutors({
+      name: name as string,
+      category: category as string,
+      rating: Number(price),
+      price: Number(price),
+    });
 
     res.status(200).json({
       success: true,
