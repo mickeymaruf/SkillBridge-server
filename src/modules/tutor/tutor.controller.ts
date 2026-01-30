@@ -3,13 +3,15 @@ import { TutorService } from "./tutor.service";
 
 const getAllTutors = async (req: Request, res: Response) => {
   try {
-    const { name, category, rating, price } = req.query;
+    const { name, category, rating, max, min, isFeatured } = req.query;
 
     const result = await TutorService.getAllTutors({
       name: name as string,
       category: category as string,
-      rating: Number(price),
-      price: Number(price),
+      rating: Number(rating),
+      priceMax: Number(max),
+      priceMin: Number(min),
+      isFeatured: isFeatured ? isFeatured === "true" : undefined,
     });
 
     res.status(200).json({

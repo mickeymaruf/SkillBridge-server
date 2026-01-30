@@ -5,14 +5,18 @@ interface TutorFilters {
   name?: string;
   category?: string;
   rating?: number;
-  price?: number;
+  priceMin?: number;
+  priceMax?: number;
+  isFeatured?: boolean | undefined;
 }
 
 const getAllTutors = async ({
   name,
   category,
   rating,
-  price,
+  priceMin,
+  priceMax,
+  isFeatured,
 }: TutorFilters) => {
   const filters: TutorProfileWhereInput[] = [];
 
@@ -28,10 +32,18 @@ const getAllTutors = async ({
     });
   }
 
-  if (price) {
+  if (priceMin) {
     filters.push({
       hourlyRate: {
-        gte: Number(price),
+        gte: Number(priceMin),
+      },
+    });
+  }
+
+  if (priceMax) {
+    filters.push({
+      hourlyRate: {
+        lte: Number(priceMax),
       },
     });
   }
@@ -42,6 +54,10 @@ const getAllTutors = async ({
         gte: Number(rating),
       },
     });
+  }
+
+  if (isFeatured) {
+    filters.push({ isFeatured });
   }
 
   if (name) {

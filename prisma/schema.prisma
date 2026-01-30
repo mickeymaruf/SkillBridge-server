@@ -101,14 +101,15 @@ model Verification {
 }
 
 model TutorProfile {
-  id         String   @id @default(uuid())
-  userId     String   @unique
-  bio        String?
-  hourlyRate Int
-  rating     Int      @default(0)
-  isFeatured Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  bio         String?
+  hourlyRate  Int
+  rating      Int      @default(0)
+  reviewCount Int      @default(0)
+  isFeatured  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   user         User            @relation(fields: [userId], references: [id])
   categories   TutorCategory[]
