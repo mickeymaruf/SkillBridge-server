@@ -1,6 +1,47 @@
 import { prisma } from "../../lib/prisma";
 import { UserStatus } from "../../../generated/prisma/enums";
 
+const getAllBookings = async () => {
+  return await prisma.booking.findMany({
+    select: {
+      id: true,
+      status: true,
+      createdAt: true,
+
+      slot: {
+        select: {
+          startTime: true,
+          endTime: true,
+          isBooked: true,
+        },
+      },
+
+      tutorProfile: {
+        select: {
+          hourlyRate: true,
+          isFeatured: true,
+          user: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+        },
+      },
+
+      student: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
+
+    orderBy: { createdAt: "desc" },
+  });
+};
+
 const getAllUsers = async () => {
   return await prisma.user.findMany({
     include: {
@@ -27,6 +68,7 @@ const updateUserStatus = async (id: string, status: UserStatus) => {
 };
 
 export const AdminService = {
+  getAllBookings,
   getAllUsers,
   getUserById,
   updateUserStatus,

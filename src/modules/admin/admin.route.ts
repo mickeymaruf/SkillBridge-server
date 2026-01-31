@@ -5,10 +5,15 @@ import { UserRole } from "../../../generated/prisma/enums";
 
 const router = express.Router();
 
-router.get("/", auth(UserRole.ADMIN), AdminController.getAllUsers);
-router.get("/:id", auth(UserRole.ADMIN), AdminController.getUser);
+router.get(
+  "/get-all-bookings",
+  auth(UserRole.ADMIN),
+  AdminController.getAllBookings,
+);
+router.get("/users", auth(UserRole.ADMIN), AdminController.getAllUsers);
+router.get("/users/:id", auth(UserRole.ADMIN), AdminController.getUser);
 router.patch(
-  "/:id/status",
+  "/users/:id/status",
   auth(UserRole.ADMIN),
   AdminController.updateUserStatus,
 );

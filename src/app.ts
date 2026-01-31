@@ -1,6 +1,6 @@
 import { toNodeHandler } from "better-auth/node";
 import express from "express";
-// import cors from "cors";
+import cors from "cors";
 import { auth } from "./lib/auth";
 import { TutorRouter } from "./modules/tutor/tutor.route";
 import { UserRouter } from "./modules/user/user.route";
@@ -12,12 +12,12 @@ import config from "./config/config";
 
 const app = express();
 
-// app.use(
-//   cors({
-//     origin: config.appUrl,
-//     credentials: true,
-//   }),
-// );
+app.use(
+  cors({
+    origin: config.appUrl,
+    credentials: true,
+  }),
+);
 
 app.use("/api/auth", UserRouter);
 app.all("/api/auth/*splat", toNodeHandler(auth));

@@ -3,6 +3,7 @@ import { prisma } from "../../lib/prisma";
 const getAllCategories = async () => {
   return await prisma.category.findMany({
     select: {
+      id: true,
       name: true,
       slug: true,
     },
