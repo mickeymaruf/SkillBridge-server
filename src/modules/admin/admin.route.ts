@@ -5,6 +5,7 @@ import { UserRole } from "../../../generated/prisma/enums";
 
 const router = express.Router();
 
+router.get("/analytics", auth(UserRole.ADMIN), AdminController.getAnalytics);
 router.get(
   "/get-all-bookings",
   auth(UserRole.ADMIN),

@@ -2,6 +2,25 @@ import { Request, Response } from "express";
 import { AdminService } from "./admin.service";
 import { UserStatus } from "../../../generated/prisma/enums";
 
+const getAnalytics = async (_req: Request, res: Response) => {
+  try {
+    const result = await AdminService.getAnalytics();
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "An unexpected error occurred while get analytics",
+    });
+  }
+};
+
 const getAllUsers = async (_req: Request, res: Response) => {
   try {
     const result = await AdminService.getAllUsers();
@@ -92,6 +111,7 @@ const updateUserStatus = async (req: Request, res: Response) => {
 };
 
 export const AdminController = {
+  getAnalytics,
   getAllBookings,
   getAllUsers,
   getUser,

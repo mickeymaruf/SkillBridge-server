@@ -1,5 +1,39 @@
 import { prisma } from "../../lib/prisma";
-import { UserStatus } from "../../../generated/prisma/enums";
+import { UserRole, UserStatus } from "../../../generated/prisma/enums";
+
+const getAnalytics = async () => {
+  return await prisma.$transaction(async (tx) => {
+    const userCount = await tx.user.count();
+    const tutorCount = await tx.tutorProfile.count();
+    const studentCount = await tx.user.count({
+      where: { role: UserRole.STUDENT },
+    });
+    const adminCount = await tx.user.count({
+      where: { role: UserRole.ADMIN },
+    });
+    const bannerUserCount = await tx.user.count({
+      where: { status: UserStatus.BANNED },
+    });
+    const unverifiedUserCount = await tx.user.count({
+      where: { emailVerified: false },
+    });
+    const bookingCount = await tx.booking.count();
+    const categoryCount = await tx.category.count();
+    const reviewCount = await tx.review.count();
+
+    return {
+      userCount,
+      tutorCount,
+      studentCount,
+      adminCount,
+      bookingCount,
+      bannerUserCount,
+      unverifiedUserCount,
+      categoryCount,
+      reviewCount,
+    };
+  });
+};
 
 const getAllBookings = async () => {
   return await prisma.booking.findMany({
@@ -68,6 +102,7 @@ const updateUserStatus = async (id: string, status: UserStatus) => {
 };
 
 export const AdminService = {
+  getAnalytics,
   getAllBookings,
   getAllUsers,
   getUserById,
