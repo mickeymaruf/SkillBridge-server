@@ -7,6 +7,7 @@ const router = express.Router();
 
 router.get("/", TutorController.getAllTutors);
 router.get("/:tutorId", TutorController.getTutorById);
+router.get("/profile/me", auth(UserRole.TUTOR), TutorController.getMyProfile);
 router.post("/profile", auth(UserRole.TUTOR), TutorController.createProfile);
 router.patch("/profile", auth(UserRole.TUTOR), TutorController.updateProfile);
 router.put(

@@ -31,13 +31,13 @@ const auth = (...roles: UserRole[]) => {
         });
       }
 
-      if (!session.user.emailVerified) {
-        return res.status(403).json({
-          success: false,
-          message:
-            "Email verification required! Please verify your email first.",
-        });
-      }
+      // if (!session.user.emailVerified) {
+      //   return res.status(403).json({
+      //     success: false,
+      //     message:
+      //       "Email verification required! Please verify your email first.",
+      //   });
+      // }
 
       if (roles.length && !roles.includes(session.user.role as UserRole)) {
         return res.status(403).json({
