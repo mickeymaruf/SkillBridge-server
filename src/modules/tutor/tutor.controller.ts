@@ -69,6 +69,46 @@ const getMyProfile = async (req: Request, res: Response) => {
   }
 };
 
+const getTutorAvailability = async (req: Request, res: Response) => {
+  try {
+    const result = await TutorService.getTutorAvailability(
+      req.user?.id as string,
+    );
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      error:
+        error instanceof Error && error.message
+          ? error.message
+          : "An unexpected error occurred during getTutorAvailability",
+    });
+  }
+};
+
+const getTutorBookings = async (req: Request, res: Response) => {
+  try {
+    const result = await TutorService.getTutorBookings(req.user?.id as string);
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      error:
+        error instanceof Error && error.message
+          ? error.message
+          : "An unexpected error occurred during getTutorBookings",
+    });
+  }
+};
+
 const createProfile = async (req: Request, res: Response) => {
   try {
     const result = await TutorService.createProfile(req.user?.id as string);
@@ -159,4 +199,6 @@ export const TutorController = {
   updateProfile,
   createAvailability,
   setCategories,
+  getTutorAvailability,
+  getTutorBookings,
 };

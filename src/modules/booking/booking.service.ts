@@ -47,9 +47,9 @@ const getBookingById = async (id: string) => {
   });
 };
 
-const markBookingCompleted = async (id: string) => {
+const markBookingCompleted = async (bookingId: string, userId: string) => {
   return await prisma.booking.update({
-    where: { id },
+    where: { id: bookingId, tutorProfile: { userId } },
     data: { status: BookingStatus.COMPLETED },
   });
 };

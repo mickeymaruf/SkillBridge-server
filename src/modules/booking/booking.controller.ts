@@ -66,6 +66,7 @@ const markCompleted = async (req: Request, res: Response) => {
   try {
     const result = await BookingService.markBookingCompleted(
       req.params.id as string,
+      req.user?.id as string,
     );
 
     res.status(200).json({

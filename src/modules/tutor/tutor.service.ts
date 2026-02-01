@@ -151,6 +151,19 @@ const getMyProfile = async (id: string) => {
   });
 };
 
+const getTutorAvailability = async (id: string) => {
+  return await prisma.availability.findMany({
+    where: { tutorProfile: { userId: id }, isBooked: false },
+  });
+};
+
+const getTutorBookings = async (id: string) => {
+  return await prisma.booking.findMany({
+    where: { tutorProfile: { userId: id } },
+    include: { student: true, slot: true },
+  });
+};
+
 const createProfile = async (userId: string) => {
   return await prisma.tutorProfile.create({
     data: { userId },
@@ -212,7 +225,19 @@ const createAvailability = async (
     select: { id: true },
   });
 
-  if (startTime >= endTime) {
+  const start = new Date(startTime);
+  const end = new Date(endTime);
+  const now = new Date();
+
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+    throw new Error("Invalid date format");
+  }
+
+  if (start.getTime() <= now.getTime()) {
+    throw new Error("You cannot book a time in the past");
+  }
+
+  if (start.getTime() >= end.getTime()) {
     throw new Error("startTime must be before endTime");
   }
 
@@ -220,8 +245,8 @@ const createAvailability = async (
     const conflict = await tx.availability.findFirst({
       where: {
         tutorProfileId: tutorProfile.id,
-        startTime: { lt: endTime },
-        endTime: { gt: startTime },
+        startTime: { lt: end },
+        endTime: { gt: start },
       },
     });
 
@@ -232,8 +257,8 @@ const createAvailability = async (
     return tx.availability.create({
       data: {
         tutorProfileId: tutorProfile.id,
-        startTime,
-        endTime,
+        startTime: start,
+        endTime: end,
       },
     });
   });
@@ -247,4 +272,6 @@ export const TutorService = {
   updateProfile,
   createAvailability,
   setCategories,
+  getTutorAvailability,
+  getTutorBookings,
 };
