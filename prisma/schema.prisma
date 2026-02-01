@@ -153,7 +153,7 @@ model Availability {
   isBooked       Boolean  @default(false)
 
   tutorProfile TutorProfile @relation(fields: [tutorProfileId], references: [id])
-  booking      Booking?
+  booking      Booking[]
 
   @@map("availability")
 }
@@ -163,7 +163,7 @@ model Booking {
   studentId      String
   // tutorId        String
   tutorProfileId String
-  slotId         String        @unique
+  slotId         String
   status         BookingStatus @default(CONFIRMED)
   createdAt      DateTime      @default(now())
 
@@ -172,6 +172,7 @@ model Booking {
   slot         Availability @relation(fields: [slotId], references: [id])
   review       Review?
 
+  @@index([slotId])
   @@map("bookings")
 }
 

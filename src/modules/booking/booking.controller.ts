@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { BookingService } from "./booking.service";
-import { UserRole } from "../../../generated/prisma/enums";
+import { BookingStatus, UserRole } from "../../../generated/prisma/enums";
 
 const createBooking = async (req: Request, res: Response) => {
   try {
@@ -26,9 +26,19 @@ const createBooking = async (req: Request, res: Response) => {
 
 const getMyBookings = async (req: Request, res: Response) => {
   try {
+    const { status } = req.query;
+
+    let statuses;
+    if (typeof status === "string") {
+      statuses = [status];
+    } else if (Array.isArray(status)) {
+      statuses = status;
+    }
+
     const result = await BookingService.getMyBookings(
       req.user?.id as string,
       req.user?.role as UserRole,
+      statuses as BookingStatus[],
     );
 
     res.status(200).json({

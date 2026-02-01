@@ -20,15 +20,26 @@ const createBooking = async (data: { studentId: string; slotId: string }) => {
   });
 };
 
-const getMyBookings = async (userId: string, role: string) => {
+const getMyBookings = async (
+  userId: string,
+  role: string,
+  statuses: BookingStatus[],
+) => {
   return await prisma.booking.findMany({
-    where:
-      role === UserRole.STUDENT
+    where: {
+      ...(role === UserRole.STUDENT
         ? { studentId: userId }
-        : { tutorProfile: { userId } },
+        : { tutorProfile: { userId } }),
+      status: { in: statuses },
+    },
+
     include: {
       slot: true,
-      tutorProfile: true,
+      tutorProfile: {
+        include: {
+          user: true,
+        },
+      },
       student: true,
     },
     orderBy: { createdAt: "desc" },
