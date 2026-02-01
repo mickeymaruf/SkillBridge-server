@@ -108,6 +108,29 @@ const updateProfile = async (req: Request, res: Response) => {
   }
 };
 
+const setCategories = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id as string;
+    const result = await TutorService.setCategories(
+      userId,
+      req.body.categoryIds,
+    );
+
+    res.status(201).json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      error:
+        error instanceof Error && error.message
+          ? error.message
+          : "An unexpected error occurred during setCategories",
+    });
+  }
+};
+
 const createAvailability = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id as string;
@@ -135,4 +158,5 @@ export const TutorController = {
   createProfile,
   updateProfile,
   createAvailability,
+  setCategories,
 };

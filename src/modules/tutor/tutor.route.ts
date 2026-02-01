@@ -11,6 +11,11 @@ router.get("/profile/me", auth(UserRole.TUTOR), TutorController.getMyProfile);
 router.post("/profile", auth(UserRole.TUTOR), TutorController.createProfile);
 router.patch("/profile", auth(UserRole.TUTOR), TutorController.updateProfile);
 router.put(
+  "/profile/set-categories",
+  auth(UserRole.TUTOR),
+  TutorController.setCategories,
+);
+router.put(
   "/availability",
   auth(UserRole.TUTOR),
   TutorController.createAvailability,

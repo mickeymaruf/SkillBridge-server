@@ -181,6 +181,28 @@ const updateProfile = async (
   });
 };
 
+const setCategories = async (userId: string, categoryIds: string[]) => {
+  return await prisma.$transaction(async (tx) => {
+    const tutorProfile = await tx.tutorProfile.findUniqueOrThrow({
+      where: { userId },
+      select: {
+        id: true,
+      },
+    });
+
+    await tx.tutorCategory.deleteMany({
+      where: { tutorProfileId: tutorProfile.id },
+    });
+
+    return await tx.tutorCategory.createMany({
+      data: categoryIds.map((categoryId) => ({
+        tutorProfileId: tutorProfile.id,
+        categoryId,
+      })),
+    });
+  });
+};
+
 const createAvailability = async (
   userId: string,
   { startTime, endTime }: { startTime: string | Date; endTime: string | Date },
@@ -224,4 +246,5 @@ export const TutorService = {
   createProfile,
   updateProfile,
   createAvailability,
+  setCategories,
 };
