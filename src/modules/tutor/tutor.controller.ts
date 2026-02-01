@@ -1,6 +1,25 @@
 import { Request, Response } from "express";
 import { TutorService } from "./tutor.service";
 
+const getMyStats = async (req: Request, res: Response) => {
+  try {
+    const result = await TutorService.getMyStats(req.user?.id as string);
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "An unexpected error occurred while get analytics",
+    });
+  }
+};
+
 const getAllTutors = async (req: Request, res: Response) => {
   try {
     const { name, category, rating, max, min, isFeatured } = req.query;
@@ -192,6 +211,7 @@ const createAvailability = async (req: Request, res: Response) => {
 };
 
 export const TutorController = {
+  getMyStats,
   getAllTutors,
   getTutorById,
   getMyProfile,

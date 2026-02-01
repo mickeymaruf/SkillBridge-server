@@ -1,3 +1,4 @@
+import { BookingStatus } from "../../../generated/prisma/enums";
 import { TutorProfileWhereInput } from "../../../generated/prisma/models";
 import { prisma } from "../../lib/prisma";
 
@@ -8,6 +9,44 @@ interface TutorFilters {
   priceMin?: number;
   priceMax?: number;
   isFeatured?: boolean | undefined;
+}
+
+export async function getMyStats(userId: string) {
+  const tutorProfile = await prisma.tutorProfile.findUniqueOrThrow({
+    where: { userId },
+    select: { id: true, hourlyRate: true },
+  });
+
+  const tutorProfileId = tutorProfile.id;
+
+  const [totalSlots, bookedSlots, upcomingSessions, completedSessions] =
+    await prisma.$transaction([
+      // 1. total slots
+      prisma.availability.count({ where: { tutorProfileId } }),
+
+      // 2. booked slots
+      prisma.availability.count({
+        where: { tutorProfileId, isBooked: true },
+      }),
+
+      // 3. upcoming sessions
+      prisma.booking.count({
+        where: { tutorProfileId, status: BookingStatus.CONFIRMED },
+      }),
+
+      // 4. completed sessions
+      prisma.booking.count({
+        where: { tutorProfileId, status: BookingStatus.COMPLETED },
+      }),
+    ]);
+
+  return {
+    totalSlots,
+    bookedSlots,
+    upcomingSessions,
+    completedSessions,
+    totalEarnings: completedSessions * tutorProfile.hourlyRate,
+  };
 }
 
 const getAllTutors = async ({
@@ -265,6 +304,7 @@ const createAvailability = async (
 };
 
 export const TutorService = {
+  getMyStats,
   getAllTutors,
   getTutorById,
   getMyProfile,

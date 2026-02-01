@@ -5,6 +5,7 @@ import { UserRole } from "../../../generated/prisma/enums";
 
 const router = express.Router();
 
+router.get("/profile/stats", auth(UserRole.TUTOR), TutorController.getMyStats);
 router.get("/", TutorController.getAllTutors);
 router.get("/:tutorId", TutorController.getTutorById);
 router.get("/profile/me", auth(UserRole.TUTOR), TutorController.getMyProfile);
