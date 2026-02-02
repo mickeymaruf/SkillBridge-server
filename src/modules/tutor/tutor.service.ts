@@ -127,6 +127,15 @@ const getAllTutors = async ({
           },
         },
       },
+      _count: {
+        select: {
+          availability: {
+            where: {
+              isBooked: false,
+            },
+          },
+        },
+      },
     },
     orderBy: {
       createdAt: "desc",
