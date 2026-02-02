@@ -9,6 +9,8 @@ import { BookingRouter } from "./modules/booking/booking.route";
 import { ReviewRouter } from "./modules/review/review.route";
 import { AdminRouter } from "./modules/admin/admin.route";
 import config from "./config/config";
+import { notFound } from "./middlewares/notFound";
+import errorHandler from "./middlewares/globalErrorHandler";
 
 const app = express();
 
@@ -39,5 +41,8 @@ app.get("/", (req, res) => {
     message: `SkillBridge app is running.`,
   });
 });
+
+app.use(notFound);
+app.use(errorHandler);
 
 export default app;

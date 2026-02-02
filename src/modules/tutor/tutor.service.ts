@@ -135,7 +135,7 @@ const getAllTutors = async ({
 };
 
 const getTutorById = async (id: string) => {
-  return await prisma.tutorProfile.findUnique({
+  return await prisma.tutorProfile.findUniqueOrThrow({
     where: { id },
     include: {
       user: true,
@@ -144,7 +144,9 @@ const getTutorById = async (id: string) => {
           category: true,
         },
       },
-      availability: true,
+      availability: {
+        where: { isBooked: false },
+      },
       reviews: {
         include: {
           student: {

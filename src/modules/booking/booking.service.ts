@@ -41,6 +41,7 @@ const getMyBookings = async (
         },
       },
       student: true,
+      review: true,
     },
     orderBy: { createdAt: "desc" },
   });
