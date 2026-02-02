@@ -1,7 +1,11 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { CategoryService } from "./category.service";
 
-const getAllCategories = async (_req: Request, res: Response) => {
+const getAllCategories = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const result = await CategoryService.getAllCategories();
 
@@ -9,18 +13,16 @@ const getAllCategories = async (_req: Request, res: Response) => {
       success: true,
       data: result,
     });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error:
-        error instanceof Error && error.message
-          ? error.message
-          : "An unexpected error occurred during getAllCategories",
-    });
+  } catch (e) {
+    next(e);
   }
 };
 
-const getCategoryBySlug = async (req: Request, res: Response) => {
+const getCategoryBySlug = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { slug } = req.params;
     const result = await CategoryService.getCategoryBySlug(slug as string);
@@ -29,18 +31,16 @@ const getCategoryBySlug = async (req: Request, res: Response) => {
       success: true,
       data: result,
     });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error:
-        error instanceof Error && error.message
-          ? error.message
-          : "An unexpected error occurred during getCategoryBySlug",
-    });
+  } catch (e) {
+    next(e);
   }
 };
 
-const createCategory = async (req: Request, res: Response) => {
+const createCategory = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const result = await CategoryService.createCategory(req.body);
 
@@ -48,18 +48,16 @@ const createCategory = async (req: Request, res: Response) => {
       success: true,
       data: result,
     });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error:
-        error instanceof Error && error.message
-          ? error.message
-          : "An unexpected error occurred during createCategory",
-    });
+  } catch (e) {
+    next(e);
   }
 };
 
-const updateCategory = async (req: Request, res: Response) => {
+const updateCategory = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { id } = req.params;
     const result = await CategoryService.updateCategory(id as string, req.body);
@@ -68,18 +66,16 @@ const updateCategory = async (req: Request, res: Response) => {
       success: true,
       data: result,
     });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error:
-        error instanceof Error && error.message
-          ? error.message
-          : "An unexpected error occurred during updateCategory",
-    });
+  } catch (e) {
+    next(e);
   }
 };
 
-const deleteCategory = async (req: Request, res: Response) => {
+const deleteCategory = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { id } = req.params;
     const result = await CategoryService.deleteCategory(id as string);
@@ -88,14 +84,8 @@ const deleteCategory = async (req: Request, res: Response) => {
       success: true,
       data: result,
     });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error:
-        error instanceof Error && error.message
-          ? error.message
-          : "An unexpected error occurred during deleteCategory",
-    });
+  } catch (e) {
+    next(e);
   }
 };
 

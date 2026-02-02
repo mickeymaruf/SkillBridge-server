@@ -1,62 +1,63 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { Prisma } from "../../generated/prisma/client";
 
-function errorHandler(
-  err: unknown,
+export function globalErrorHandler(
+  err: any,
   req: Request,
   res: Response,
   next: NextFunction,
 ) {
+  console.error(err);
+
   let statusCode = 500;
-  let message = "Internal Server Error";
-  let details: unknown = err;
+  let errorMessage = "Internal Server Error";
 
   if (err instanceof Prisma.PrismaClientValidationError) {
     statusCode = 400;
-    message = "Invalid or missing fields in request";
+    errorMessage = "You provided incorrect field type or missing fields!";
   } else if (err instanceof Prisma.PrismaClientKnownRequestError) {
-    statusCode = 400;
-
     switch (err.code) {
       case "P2025":
-        message = "Operation failed because the required record was not found";
+        statusCode = 400;
+        errorMessage =
+          "Operation failed because one or more required records were not found.";
         break;
-
       case "P2002":
-        message = "Duplicate key error";
+        statusCode = 400;
+        errorMessage = "Duplicate key error";
         break;
-
       case "P2003":
-        message = "Foreign key constraint failed";
+        statusCode = 400;
+        errorMessage = "Foreign key constraint failed";
         break;
-
       default:
-        message = "Database request error";
+        statusCode = 400;
+        errorMessage = err.message;
     }
   } else if (err instanceof Prisma.PrismaClientUnknownRequestError) {
-    message = "Unknown error occurred during database query execution";
+    statusCode = 500;
+    errorMessage = "Error occurred during query execution";
   } else if (err instanceof Prisma.PrismaClientInitializationError) {
     switch (err.errorCode) {
       case "P1000":
         statusCode = 401;
-        message = "Authentication failed. Check database credentials";
+        errorMessage = "Authentication failed. Please check your credentials!";
         break;
-
       case "P1001":
-        statusCode = 503;
-        message = "Unable to reach database server";
+        statusCode = 400;
+        errorMessage = "Can't reach database server";
         break;
-
       default:
-        message = "Database initialization error";
+        statusCode = 500;
+        errorMessage = err.message;
     }
+  } else if (err.status && err.message) {
+    statusCode = err.status;
+    errorMessage = err.message;
   }
 
-  res.status(statusCode).json({
+  return res.status(statusCode).json({
     success: false,
-    message,
-    details: process.env.NODE_ENV === "production" ? undefined : details,
+    message: errorMessage,
   });
 }
-
-export default errorHandler;

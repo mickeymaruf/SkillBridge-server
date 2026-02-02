@@ -1,8 +1,12 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { AdminService } from "./admin.service";
 import { UserStatus } from "../../../generated/prisma/enums";
 
-const getAnalytics = async (_req: Request, res: Response) => {
+const getAnalytics = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const result = await AdminService.getAnalytics();
 
@@ -10,18 +14,12 @@ const getAnalytics = async (_req: Request, res: Response) => {
       success: true,
       data: result,
     });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error:
-        error instanceof Error
-          ? error.message
-          : "An unexpected error occurred while get analytics",
-    });
+  } catch (e) {
+    next(e);
   }
 };
 
-const getAllUsers = async (_req: Request, res: Response) => {
+const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await AdminService.getAllUsers();
 
@@ -29,15 +27,16 @@ const getAllUsers = async (_req: Request, res: Response) => {
       success: true,
       data: result,
     });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error: "Failed to fetch users",
-    });
+  } catch (e) {
+    next(e);
   }
 };
 
-const getAllBookings = async (_req: Request, res: Response) => {
+const getAllBookings = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const result = await AdminService.getAllBookings();
 
@@ -45,18 +44,12 @@ const getAllBookings = async (_req: Request, res: Response) => {
       success: true,
       data: result,
     });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error:
-        error instanceof Error
-          ? error.message
-          : "An unexpected error occurred while get-all-bookings",
-    });
+  } catch (e) {
+    next(e);
   }
 };
 
-const getUser = async (req: Request, res: Response) => {
+const getUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await AdminService.getUserById(req.params.id as string);
 
@@ -64,15 +57,16 @@ const getUser = async (req: Request, res: Response) => {
       success: true,
       data: result,
     });
-  } catch (error) {
-    res.status(404).json({
-      success: false,
-      error: "User not found",
-    });
+  } catch (e) {
+    next(e);
   }
 };
 
-const updateUserStatus = async (req: Request, res: Response) => {
+const updateUserStatus = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { status } = req.body;
 
@@ -99,14 +93,8 @@ const updateUserStatus = async (req: Request, res: Response) => {
       success: true,
       data: result,
     });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error:
-        error instanceof Error
-          ? error.message
-          : "An unexpected error occurred while updating user status",
-    });
+  } catch (e) {
+    next(e);
   }
 };
 

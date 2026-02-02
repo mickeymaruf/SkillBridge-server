@@ -1,7 +1,11 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { UserService } from "./user.service";
 
-const getCurrentUser = async (req: Request, res: Response) => {
+const getCurrentUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const result = await UserService.getCurrentUser(req);
 
@@ -9,14 +13,8 @@ const getCurrentUser = async (req: Request, res: Response) => {
       success: true,
       data: result,
     });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error:
-        error instanceof Error && error.message
-          ? error.message
-          : "An unexpected error occurred during getCurrentUser",
-    });
+  } catch (e) {
+    next(e);
   }
 };
 

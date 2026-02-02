@@ -1,7 +1,11 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { ReviewService } from "./review.service";
 
-const getTutorReviews = async (req: Request, res: Response) => {
+const getTutorReviews = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const result = await ReviewService.getReviewsByTutor(
       req.params.tutorProfileId as string,
@@ -11,15 +15,16 @@ const getTutorReviews = async (req: Request, res: Response) => {
       success: true,
       data: result,
     });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error: "Failed to fetch reviews",
-    });
+  } catch (e) {
+    next(e);
   }
 };
 
-const createReview = async (req: Request, res: Response) => {
+const createReview = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const result = await ReviewService.createReview(
       req.user?.id as string,
@@ -30,14 +35,8 @@ const createReview = async (req: Request, res: Response) => {
       success: true,
       data: result,
     });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error:
-        error instanceof Error && error.message
-          ? error.message
-          : "An unexpected error occurred during createReview",
-    });
+  } catch (e) {
+    next(e);
   }
 };
 

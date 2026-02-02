@@ -1,8 +1,12 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { BookingService } from "./booking.service";
 import { BookingStatus, UserRole } from "../../../generated/prisma/enums";
 
-const createBooking = async (req: Request, res: Response) => {
+const createBooking = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const result = await BookingService.createBooking({
       studentId: req.user?.id as string,
@@ -13,18 +17,16 @@ const createBooking = async (req: Request, res: Response) => {
       success: true,
       data: result,
     });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error:
-        error instanceof Error && error.message
-          ? error.message
-          : "An unexpected error occurred during createBooking",
-    });
+  } catch (e) {
+    next(e);
   }
 };
 
-const getMyBookings = async (req: Request, res: Response) => {
+const getMyBookings = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { status } = req.query;
 
@@ -45,18 +47,16 @@ const getMyBookings = async (req: Request, res: Response) => {
       success: true,
       data: result,
     });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error:
-        error instanceof Error && error.message
-          ? error.message
-          : "An unexpected error occurred during getMyBookings",
-    });
+  } catch (e) {
+    next(e);
   }
 };
 
-const getBookingDetails = async (req: Request, res: Response) => {
+const getBookingDetails = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const result = await BookingService.getBookingById(req.params.id as string);
 
@@ -64,15 +64,16 @@ const getBookingDetails = async (req: Request, res: Response) => {
       success: true,
       data: result,
     });
-  } catch (error) {
-    res.status(404).json({
-      success: false,
-      error: "Booking not found",
-    });
+  } catch (e) {
+    next(e);
   }
 };
 
-const markCompleted = async (req: Request, res: Response) => {
+const markCompleted = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const result = await BookingService.markBookingCompleted(
       req.params.id as string,
@@ -83,15 +84,16 @@ const markCompleted = async (req: Request, res: Response) => {
       success: true,
       data: result,
     });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error: "Failed to mark booking as completed",
-    });
+  } catch (e) {
+    next(e);
   }
 };
 
-const cancelBooking = async (req: Request, res: Response) => {
+const cancelBooking = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const result = await BookingService.cancelBooking(req.params.id as string);
 
@@ -99,11 +101,8 @@ const cancelBooking = async (req: Request, res: Response) => {
       success: true,
       data: result,
     });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error: "Failed to cancel booking",
-    });
+  } catch (e) {
+    next(e);
   }
 };
 

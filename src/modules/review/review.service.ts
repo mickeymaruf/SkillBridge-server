@@ -44,6 +44,9 @@ const createReview = async (
     await tx.review.create({
       data: { studentId, ...data, tutorProfileId },
     });
+    await tx.review.create({
+      data: { studentId, ...data, tutorProfileId },
+    });
 
     // get (avg, count) reviews by review.aggregate
     const stats = await tx.review.aggregate({

@@ -9,7 +9,7 @@ import { BookingRouter } from "./modules/booking/booking.route";
 import { ReviewRouter } from "./modules/review/review.route";
 import { AdminRouter } from "./modules/admin/admin.route";
 import { notFound } from "./middlewares/notFound";
-import errorHandler from "./middlewares/globalErrorHandler";
+import { globalErrorHandler } from "./middlewares/globalErrorHandler";
 
 const app = express();
 
@@ -69,6 +69,6 @@ app.get("/", (req, res) => {
 });
 
 app.use(notFound);
-app.use(errorHandler);
+app.use(globalErrorHandler);
 
 export default app;

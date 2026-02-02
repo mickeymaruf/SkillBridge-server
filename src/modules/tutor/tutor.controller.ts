@@ -1,7 +1,7 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { TutorService } from "./tutor.service";
 
-const getMyStats = async (req: Request, res: Response) => {
+const getMyStats = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await TutorService.getMyStats(req.user?.id as string);
 
@@ -9,18 +9,16 @@ const getMyStats = async (req: Request, res: Response) => {
       success: true,
       data: result,
     });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error:
-        error instanceof Error
-          ? error.message
-          : "An unexpected error occurred while get analytics",
-    });
+  } catch (e) {
+    next(e);
   }
 };
 
-const getAllTutors = async (req: Request, res: Response) => {
+const getAllTutors = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { name, category, rating, max, min, isFeatured } = req.query;
 
@@ -37,18 +35,16 @@ const getAllTutors = async (req: Request, res: Response) => {
       success: true,
       data: result,
     });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error:
-        error instanceof Error && error.message
-          ? error.message
-          : "An unexpected error occurred during getAllTutors",
-    });
+  } catch (e) {
+    next(e);
   }
 };
 
-const getTutorById = async (req: Request, res: Response) => {
+const getTutorById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const result = await TutorService.getTutorById(
       req.params.tutorId as string,
@@ -58,18 +54,16 @@ const getTutorById = async (req: Request, res: Response) => {
       success: true,
       data: result,
     });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error:
-        error instanceof Error && error.message
-          ? error.message
-          : "An unexpected error occurred during getTutorById",
-    });
+  } catch (e) {
+    next(e);
   }
 };
 
-const getMyProfile = async (req: Request, res: Response) => {
+const getMyProfile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const result = await TutorService.getMyProfile(req.user?.id as string);
 
@@ -77,18 +71,16 @@ const getMyProfile = async (req: Request, res: Response) => {
       success: true,
       data: result,
     });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error:
-        error instanceof Error && error.message
-          ? error.message
-          : "An unexpected error occurred during getTutorById",
-    });
+  } catch (e) {
+    next(e);
   }
 };
 
-const getTutorAvailability = async (req: Request, res: Response) => {
+const getTutorAvailability = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const result = await TutorService.getTutorAvailability(
       req.user?.id as string,
@@ -98,18 +90,16 @@ const getTutorAvailability = async (req: Request, res: Response) => {
       success: true,
       data: result,
     });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error:
-        error instanceof Error && error.message
-          ? error.message
-          : "An unexpected error occurred during getTutorAvailability",
-    });
+  } catch (e) {
+    next(e);
   }
 };
 
-const getTutorBookings = async (req: Request, res: Response) => {
+const getTutorBookings = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const result = await TutorService.getTutorBookings(req.user?.id as string);
 
@@ -117,18 +107,16 @@ const getTutorBookings = async (req: Request, res: Response) => {
       success: true,
       data: result,
     });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error:
-        error instanceof Error && error.message
-          ? error.message
-          : "An unexpected error occurred during getTutorBookings",
-    });
+  } catch (e) {
+    next(e);
   }
 };
 
-const createProfile = async (req: Request, res: Response) => {
+const createProfile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const result = await TutorService.createProfile(req.user?.id as string);
 
@@ -136,18 +124,16 @@ const createProfile = async (req: Request, res: Response) => {
       success: true,
       data: result,
     });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error:
-        error instanceof Error && error.message
-          ? error.message
-          : "An unexpected error occurred during createProfile",
-    });
+  } catch (e) {
+    next(e);
   }
 };
 
-const updateProfile = async (req: Request, res: Response) => {
+const updateProfile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const userId = req.user?.id as string;
     const result = await TutorService.updateProfile(userId, req.body);
@@ -156,19 +142,19 @@ const updateProfile = async (req: Request, res: Response) => {
       success: true,
       data: result,
     });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error:
-        error instanceof Error && error.message
-          ? error.message
-          : "An unexpected error occurred during updateProfile",
-    });
+  } catch (e) {
+    next(e);
   }
 };
 
-const setCategories = async (req: Request, res: Response) => {
+const setCategories = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
+    throw new Error("Function not implemented.");
+
     const userId = req.user?.id as string;
     const result = await TutorService.setCategories(
       userId,
@@ -179,18 +165,16 @@ const setCategories = async (req: Request, res: Response) => {
       success: true,
       data: result,
     });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error:
-        error instanceof Error && error.message
-          ? error.message
-          : "An unexpected error occurred during setCategories",
-    });
+  } catch (e) {
+    next(e);
   }
 };
 
-const createAvailability = async (req: Request, res: Response) => {
+const createAvailability = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const userId = req.user?.id as string;
     const result = await TutorService.createAvailability(userId, req.body);
@@ -199,14 +183,8 @@ const createAvailability = async (req: Request, res: Response) => {
       success: true,
       data: result,
     });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error:
-        error instanceof Error && error.message
-          ? error.message
-          : "An unexpected error occurred during createAvailability",
-    });
+  } catch (e) {
+    next(e);
   }
 };
 
