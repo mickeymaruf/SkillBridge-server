@@ -1,4 +1,5 @@
 import { BookingStatus, UserRole } from "../../../generated/prisma/enums";
+import { AppError } from "../../lib/AppError";
 import { prisma } from "../../lib/prisma";
 
 const createBooking = async (data: { studentId: string; slotId: string }) => {
@@ -7,7 +8,7 @@ const createBooking = async (data: { studentId: string; slotId: string }) => {
       where: { id: data.slotId },
     });
 
-    if (availability.isBooked) throw new Error("Slot already booked!");
+    if (availability.isBooked) throw new AppError("Slot already booked", 409);
 
     await tx.availability.update({
       where: { id: data.slotId },

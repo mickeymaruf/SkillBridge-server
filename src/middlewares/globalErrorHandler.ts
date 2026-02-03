@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { Prisma } from "../../generated/prisma/client";
+import { AppError } from "../lib/AppError";
 
 export function globalErrorHandler(
   err: any,
@@ -51,7 +52,7 @@ export function globalErrorHandler(
         statusCode = 500;
         errorMessage = err.message;
     }
-  } else if (err.status && err.message) {
+  } else if (err instanceof AppError) {
     statusCode = err.status;
     errorMessage = err.message;
   }

@@ -1,5 +1,6 @@
 import { BookingStatus } from "../../../generated/prisma/enums";
 import { TutorProfileWhereInput } from "../../../generated/prisma/models";
+import { AppError } from "../../lib/AppError";
 import { prisma } from "../../lib/prisma";
 
 interface TutorFilters {
@@ -281,15 +282,15 @@ const createAvailability = async (
   const now = new Date();
 
   if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-    throw new Error("Invalid date format");
+    throw new AppError("Invalid date format", 400);
   }
 
   if (start.getTime() <= now.getTime()) {
-    throw new Error("You cannot book a time in the past");
+    throw new AppError("You cannot book a time in the past", 400);
   }
 
   if (start.getTime() >= end.getTime()) {
-    throw new Error("startTime must be before endTime");
+    throw new AppError("startTime must be before endTime", 400);
   }
 
   return prisma.$transaction(async (tx) => {
@@ -302,7 +303,10 @@ const createAvailability = async (
     });
 
     if (conflict) {
-      throw new Error("This time slot overlaps with an existing availability");
+      throw new AppError(
+        "This time slot overlaps with an existing availability",
+        409,
+      );
     }
 
     return tx.availability.create({

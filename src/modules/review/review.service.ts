@@ -1,4 +1,5 @@
 import { BookingStatus } from "../../../generated/prisma/enums";
+import { AppError } from "../../lib/AppError";
 import { prisma } from "../../lib/prisma";
 
 const getReviewsByTutor = async (tutorProfileId: string) => {
@@ -34,16 +35,13 @@ const createReview = async (
     const { tutorProfileId } = booking;
 
     if (booking.studentId !== studentId) {
-      throw new Error("Unauthorized review attempt");
+      throw new AppError("Unauthorized review attempt", 403);
     }
 
     if (booking.status !== BookingStatus.COMPLETED) {
-      throw new Error("Booking must be completed before review");
+      throw new AppError("Booking must be completed before review", 400);
     }
 
-    await tx.review.create({
-      data: { studentId, ...data, tutorProfileId },
-    });
     await tx.review.create({
       data: { studentId, ...data, tutorProfileId },
     });

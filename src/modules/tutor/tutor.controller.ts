@@ -153,8 +153,6 @@ const setCategories = async (
   next: NextFunction,
 ) => {
   try {
-    throw new Error("Function not implemented.");
-
     const userId = req.user?.id as string;
     const result = await TutorService.setCategories(
       userId,
