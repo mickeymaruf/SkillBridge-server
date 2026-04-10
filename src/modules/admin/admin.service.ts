@@ -101,10 +101,21 @@ const updateUserStatus = async (id: string, status: UserStatus) => {
   });
 };
 
+const setFeaturedTutor = async (
+  tutorProfileId: string,
+  isFeatured: boolean,
+) => {
+  return await prisma.tutorProfile.update({
+    where: { id: tutorProfileId },
+    data: { isFeatured },
+  });
+};
+
 export const AdminService = {
   getAnalytics,
   getAllBookings,
   getAllUsers,
   getUserById,
   updateUserStatus,
+  setFeaturedTutor,
 };

@@ -98,10 +98,31 @@ const updateUserStatus = async (
   }
 };
 
+const setFeaturedTutor = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const result = await AdminService.setFeaturedTutor(
+      req.params.id as string,
+      req.body.isFeatured,
+    );
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 export const AdminController = {
   getAnalytics,
   getAllBookings,
   getAllUsers,
   getUser,
   updateUserStatus,
+  setFeaturedTutor,
 };

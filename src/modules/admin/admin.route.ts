@@ -18,5 +18,10 @@ router.patch(
   auth(UserRole.ADMIN),
   AdminController.updateUserStatus,
 );
+router.patch(
+  "/tutor-profiles/:id/featured",
+  auth(UserRole.ADMIN),
+  AdminController.setFeaturedTutor,
+);
 
 export const AdminRouter = router;
