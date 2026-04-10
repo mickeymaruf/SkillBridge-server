@@ -144,6 +144,44 @@ const getAllTutors = async ({
   });
 };
 
+const getRelatedTutors = async (tutorId: string) => {
+  // 1. Get the categories of the current tutor
+  const currentTutor = await prisma.tutorProfile.findUniqueOrThrow({
+    where: { id: tutorId },
+    select: {
+      categories: {
+        select: { categoryId: true },
+      },
+    },
+  });
+
+  const categoryIds = currentTutor.categories.map((c) => c.categoryId);
+
+  // 2. Find other tutors with these categories
+  return await prisma.tutorProfile.findMany({
+    where: {
+      id: { not: tutorId }, // Exclude current tutor
+      categories: {
+        some: {
+          categoryId: { in: categoryIds },
+        },
+      },
+    },
+    take: 3, // Limit to 3 for the UI
+    include: {
+      user: true,
+      categories: {
+        include: {
+          category: true,
+        },
+      },
+    },
+    orderBy: {
+      rating: "desc",
+    },
+  });
+};
+
 const getTutorById = async (id: string) => {
   return await prisma.tutorProfile.findUniqueOrThrow({
     where: { id },
@@ -322,6 +360,7 @@ const createAvailability = async (
 export const TutorService = {
   getMyStats,
   getAllTutors,
+  getRelatedTutors,
   getTutorById,
   getMyProfile,
   createProfile,

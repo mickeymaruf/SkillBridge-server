@@ -9,6 +9,7 @@ router.get("/profile/stats", auth(UserRole.TUTOR), TutorController.getMyStats);
 router.get("/", TutorController.getAllTutors);
 router.post("/ai-search", TutorController.parseAiSearch);
 router.get("/:tutorId", TutorController.getTutorById);
+router.get("/:tutorId/related", TutorController.getRelatedTutors);
 router.get("/profile/me", auth(UserRole.TUTOR), TutorController.getMyProfile);
 router.get(
   "/profile/availability",

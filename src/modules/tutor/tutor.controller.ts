@@ -89,6 +89,25 @@ export const parseAiSearch = async (
     next(e);
   }
 };
+
+const getRelatedTutors = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const result = await TutorService.getRelatedTutors(
+      req.params.tutorId as string,
+    );
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 const getTutorById = async (
   req: Request,
   res: Response,
@@ -239,6 +258,7 @@ export const TutorController = {
   getMyStats,
   getAllTutors,
   parseAiSearch,
+  getRelatedTutors,
   getTutorById,
   getMyProfile,
   createProfile,
