@@ -1,5 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import { TutorService } from "./tutor.service";
+import { openai } from "@ai-sdk/openai";
+import { generateObject } from "ai";
+import { z } from "zod";
+import { google } from "@ai-sdk/google";
+import { prisma } from "../../lib/prisma";
 
 const getMyStats = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -40,6 +45,50 @@ const getAllTutors = async (
   }
 };
 
+export const parseAiSearch = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { prompt } = req.body;
+
+    const dbCategories = await prisma.category.findMany({
+      select: { name: true, slug: true },
+    });
+
+    const categoryList = dbCategories
+      .map((c) => `${c.name} (slug: ${c.slug})`)
+      .join(", ");
+
+    const { object } = await generateObject({
+      model: google("gemini-3-flash-preview"),
+      schema: z.object({
+        name: z.string().optional(),
+        category: z.string().optional(),
+        rating: z.number().optional(),
+        max: z.number().optional(),
+        min: z.number().optional(),
+        isFeatured: z.boolean().optional(),
+      }),
+      system: `You are a search query parser for a tutor marketplace. 
+               
+               VALID CATEGORIES: [${categoryList}]
+               
+               STRICT RULES:
+               1. ONLY return fields explicitly mentioned. If not mentioned, omit the field entirely.
+               2. DO NOT return 'rating: 0', 'max: 0', or 'isFeatured: false' unless specifically requested.
+               3. Subject subjects (Art, Math, etc.) go in 'category' based on slugs, NOT in 'name'.
+               4. 'name' is for human names only. Omit "teacher", "tutor", etc.
+               5. If they say "cheap", set max to 30. If they say "top rated", set rating to 4.`,
+      prompt,
+    });
+
+    res.status(200).json({ success: true, data: object });
+  } catch (e) {
+    next(e);
+  }
+};
 const getTutorById = async (
   req: Request,
   res: Response,
@@ -189,6 +238,7 @@ const createAvailability = async (
 export const TutorController = {
   getMyStats,
   getAllTutors,
+  parseAiSearch,
   getTutorById,
   getMyProfile,
   createProfile,
