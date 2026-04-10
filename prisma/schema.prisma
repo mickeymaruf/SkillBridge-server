@@ -47,6 +47,7 @@ model User {
   tutorProfiles TutorProfile?
   bookings      Booking[]
   reviews       Review[]
+  userActivities UserActivity[]
 
   @@unique([email])
   @@map("user")
@@ -116,6 +117,14 @@ model TutorProfile {
   availability Availability[]
   bookings     Booking[]
   reviews      Review[]
+
+  // We add this field. Note: In the actual DB it will be 'vector(1536)' 
+  // but Prisma sees it as Unsupported
+  // For OpenAI
+  // embedding   Unsupported("vector(1536)")?
+
+  // MUST be 768 for Gemini gemini-embedding-001
+  embedding Unsupported("vector(768)")?
 
   @@map("tutor_profiles")
 }
@@ -190,4 +199,15 @@ model Review {
   tutorProfile TutorProfile @relation(fields: [tutorProfileId], references: [id])
 
   @@map("reviews")
+}
+
+model UserActivity {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  type      String   // "SEARCH", "VIEW_TUTOR", "BOOKING"
+  content   String   // The search query or the Tutor ID
+  createdAt DateTime @default(now())
+
+  @@map("user_activities")
 }

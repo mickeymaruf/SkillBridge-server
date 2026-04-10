@@ -1,7 +1,10 @@
+import { google } from "@ai-sdk/google";
 import { BookingStatus } from "../../../generated/prisma/enums";
 import { TutorProfileWhereInput } from "../../../generated/prisma/models";
 import { AppError } from "../../lib/AppError";
 import { prisma } from "../../lib/prisma";
+import { TutorUtils } from "./tutor.utils";
+import { embed } from "ai";
 
 interface TutorFilters {
   name?: string;
@@ -182,6 +185,73 @@ const getRelatedTutors = async (tutorId: string) => {
   });
 };
 
+const logUserActivity = async (
+  userId: string,
+  type: "SEARCH" | "VIEW_TUTOR",
+  content: string,
+) => {
+  return await prisma.userActivity.create({
+    data: {
+      userId,
+      type,
+      content,
+    },
+  });
+};
+
+export const getRecommendedMentors = async (userId: string) => {
+  // 1. Get the last 5 activities to understand user intent
+  const activities = await prisma.userActivity.findMany({
+    where: { userId },
+    orderBy: { createdAt: "desc" },
+    take: 5,
+  });
+
+  // Fallback if user has no activity yet
+  if (activities.length === 0) {
+    return await prisma.tutorProfile.findMany({
+      take: 3,
+      where: { isFeatured: true }, // or just latest
+      include: { user: { select: { name: true, image: true } } },
+    });
+  }
+
+  // 2. Combine activities into one string for the AI
+  const activitySummary = activities.map((a) => a.content).join(" ");
+
+  // 3. Generate the "User Interest Vector"
+  const { embedding } = await embed({
+    model: google.embeddingModel("gemini-embedding-001"),
+    value: activitySummary,
+    providerOptions: {
+      google: {
+        outputDimensionality: 768,
+      },
+    },
+  });
+
+  const vectorString = `[${embedding.join(",")}]`;
+
+  // 4. Find tutors using Vector Similarity Search (<=> operator)
+  // We use $queryRaw to perform the math in the database
+  const recommendedTutors = await prisma.$queryRaw`
+    SELECT 
+      tp.id, 
+      tp."userId", 
+      tp.bio, 
+      tp."hourlyRate", 
+      u.name as "userName", 
+      u.image as "userImage",
+      (tp.embedding <=> ${vectorString}::vector) as distance
+    FROM tutor_profiles tp
+    JOIN "user" u ON tp."userId" = u.id
+    ORDER BY distance ASC
+    LIMIT 3
+  `;
+
+  return recommendedTutors;
+};
+
 const getTutorById = async (id: string) => {
   return await prisma.tutorProfile.findUniqueOrThrow({
     where: { id },
@@ -268,19 +338,21 @@ const updateProfile = async (
     hourlyRate: number;
   },
 ) => {
-  return await prisma.tutorProfile.update({
-    where: {
-      userId,
-    },
-    data: {
-      bio: data.bio,
-      hourlyRate: data.hourlyRate,
-      user: {
-        update: {
-          name: data.name,
-        },
+  return await prisma.$transaction(async (tx) => {
+    // Update the profile
+    const profile = await tx.tutorProfile.update({
+      where: { userId },
+      data: {
+        bio: data.bio,
+        hourlyRate: data.hourlyRate,
+        user: { update: { name: data.name } },
       },
-    },
+    });
+
+    // Sync AI Embedding
+    await TutorUtils.syncTutorEmbedding(tx, profile.id);
+
+    return profile;
   });
 };
 
@@ -288,21 +360,26 @@ const setCategories = async (userId: string, categoryIds: string[]) => {
   return await prisma.$transaction(async (tx) => {
     const tutorProfile = await tx.tutorProfile.findUniqueOrThrow({
       where: { userId },
-      select: {
-        id: true,
-      },
+      select: { id: true },
     });
 
+    // Remove old categories
     await tx.tutorCategory.deleteMany({
       where: { tutorProfileId: tutorProfile.id },
     });
 
-    return await tx.tutorCategory.createMany({
+    // Add new ones
+    await tx.tutorCategory.createMany({
       data: categoryIds.map((categoryId) => ({
         tutorProfileId: tutorProfile.id,
         categoryId,
       })),
     });
+
+    // RE-SYNC AI: Now that categories are updated, update the vector
+    await TutorUtils.syncTutorEmbedding(tx, tutorProfile.id);
+
+    return { success: true };
   });
 };
 
@@ -361,6 +438,8 @@ export const TutorService = {
   getMyStats,
   getAllTutors,
   getRelatedTutors,
+  getRecommendedMentors,
+  logUserActivity,
   getTutorById,
   getMyProfile,
   createProfile,

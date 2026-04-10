@@ -62,4 +62,35 @@ const auth = (...roles: UserRole[]) => {
   };
 };
 
+// Add this to your auth middleware file
+export const optionalAuth = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const session = await betterAuthInstance.api.getSession({
+      headers: fromNodeHeaders(req.headers),
+    });
+
+    // If there is a session, populate req.user
+    if (session) {
+      req.user = {
+        id: session.user.id,
+        email: session.user.email,
+        name: session.user.name,
+        role: session.user.role,
+        emailVerified: session.user.emailVerified,
+      };
+    }
+
+    // ALWAYS call next(), even if no session is found
+    // This allows logged-out users to proceed
+    next();
+  } catch (error) {
+    // We still call next() even on error to ensure the route remains public
+    next();
+  }
+};
+
 export default auth;

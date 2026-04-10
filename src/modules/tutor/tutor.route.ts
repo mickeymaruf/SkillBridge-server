@@ -1,15 +1,20 @@
 import express from "express";
 import { TutorController } from "./tutor.controller";
-import auth from "../../middlewares/auth";
+import auth, { optionalAuth } from "../../middlewares/auth";
 import { UserRole } from "../../../generated/prisma/enums";
 
 const router = express.Router();
 
 router.get("/profile/stats", auth(UserRole.TUTOR), TutorController.getMyStats);
-router.get("/", TutorController.getAllTutors);
+router.get("/", optionalAuth, TutorController.getAllTutors);
 router.post("/ai-search", TutorController.parseAiSearch);
-router.get("/:tutorId", TutorController.getTutorById);
+router.get("/:tutorId", optionalAuth, TutorController.getTutorById);
 router.get("/:tutorId/related", TutorController.getRelatedTutors);
+router.get(
+  "/recommendations/me",
+  auth(UserRole.STUDENT, UserRole.TUTOR),
+  TutorController.getRecommendations,
+);
 router.get("/profile/me", auth(UserRole.TUTOR), TutorController.getMyProfile);
 router.get(
   "/profile/availability",

@@ -27,6 +27,12 @@ const getAllTutors = async (
   try {
     const { name, category, rating, max, min, isFeatured } = req.query;
 
+    // LOG ACTIVITY: If a search term or category exists, log it
+    if (req.user?.id && (name || category)) {
+      const searchTerms = [name, category].filter(Boolean).join(" ");
+      await TutorService.logUserActivity(req.user.id, "SEARCH", searchTerms);
+    }
+
     const result = await TutorService.getAllTutors({
       name: name as string,
       category: category as string,
@@ -108,6 +114,24 @@ const getRelatedTutors = async (
   }
 };
 
+const getRecommendations = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const userId = req.user?.id as string;
+    const result = await TutorService.getRecommendedMentors(userId);
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 const getTutorById = async (
   req: Request,
   res: Response,
@@ -117,6 +141,16 @@ const getTutorById = async (
     const result = await TutorService.getTutorById(
       req.params.tutorId as string,
     );
+
+    // LOG ACTIVITY: Track that the user viewed this tutor
+    // We log the tutor's bio/name so the AI understands the "meaning" of the view
+    if (req.user?.id) {
+      await TutorService.logUserActivity(
+        req.user.id,
+        "VIEW_TUTOR",
+        `Viewed tutor ${result.user.name}: ${result.bio?.substring(0, 100)}`,
+      );
+    }
 
     res.status(200).json({
       success: true,
@@ -259,6 +293,7 @@ export const TutorController = {
   getAllTutors,
   parseAiSearch,
   getRelatedTutors,
+  getRecommendations,
   getTutorById,
   getMyProfile,
   createProfile,
