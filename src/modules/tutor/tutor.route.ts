@@ -12,7 +12,7 @@ router.get("/:tutorId", optionalAuth, TutorController.getTutorById);
 router.get("/:tutorId/related", TutorController.getRelatedTutors);
 router.get(
   "/recommendations/me",
-  auth(UserRole.STUDENT, UserRole.TUTOR),
+  optionalAuth,
   TutorController.getRecommendations,
 );
 router.get("/profile/me", auth(UserRole.TUTOR), TutorController.getMyProfile);
